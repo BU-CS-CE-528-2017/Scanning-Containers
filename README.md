@@ -7,7 +7,7 @@
 ####Benjamin Owens
  
 #1.   Vision and Goals Of The Project:
-	OpenScap is an auditing tool to verify whether a system confirms to standards specified in Security Content Automation Protocol (SCAP). It checks for two features:
+OpenScap is an auditing tool to verify whether a system confirms to standards specified in Security Content Automation Protocol (SCAP). It checks for two features:
 Security Compliance: Security compliance is a state where computer systems are in line with a specific security policy. 
 Vulnerability Assessment: Vulnerability assessment is a continuous process that identifies security flaws and weaknesses in software.
 
@@ -18,7 +18,7 @@ To extend the capabilities of this (platform) for scanning container images of o
 To create an automated process for checking the compliance status & vulnerabilities without installing any tools or content in the system being scanned. Therefore, it is more suitable for scanning container images and running instances in a cloud environment.
 
 Users/Personas Of The Project:
-	The end-users for the project will be people who have Ubuntu running on their computers. They previously would not have been able to run OpenSCAP on their specific distribution of Linux and this project is built for them. 
+The end-users for the project will be people who have Ubuntu running on their computers. They previously would not have been able to run OpenSCAP on their specific distribution of Linux and this project is built for them. 
 
 
 #2.   Scope and Features Of The Project:
