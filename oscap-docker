@@ -20,9 +20,10 @@ function mount_docker(){
 	echo "	$name"
 	local target=$2;
 	echo "	$target"
-	local tmp='mktemp -d docker.XXXXXX'
-	
-	docker save $name | tar x --directory $tmp
+	mkdir tmp || echo tmp directory exists
+	local tmp=`mktemp -d docker.XXXXXX`
+	echo $tmp
+	docker save $name | tar x -C $tmp
 	echo 4
 	for layer in `find $tmp/* -maxdepth 1 -type d`; do
 		if tar tvf $layer/layer.tar | grep . > /dev/null; then
