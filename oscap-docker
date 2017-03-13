@@ -1,0 +1,93 @@
+#!/bin/bash
+
+
+
+set -e -o pipefail
+
+function catch-all(){
+	echo oscap-docker -- Compliance and Vulnerability scanning tool for containers.
+	echo
+	echo Usage:
+	echo oscap-docker image
+	echo or
+	echo oscap-docker container
+}
+
+function mount_docker(){
+	#Creates a temporary directory for the docker image
+	echo Mounting image:
+	local name=$1;
+	echo "	$name"
+	local target=$2;
+	echo "	$target"
+	local tmp='mktemp -d docker.XXXXXX'
+	
+	docker save $name | tar x --directory $tmp
+	echo 4
+	for layer in `find $tmp/* -maxdepth 1 -type d`; do
+		if tar tvf $layer/layer.tar | grep . > /dev/null; then
+			tar xf $layer/layer.tar --directory $target_dir
+		fi
+	done
+
+	rm -r $tmp
+
+}
+
+
+function unmount_docker(){
+	#Deletes the specified image
+	echo UnMounting image
+	rm -r $1
+}
+
+function get_oscap_content(){
+	local target=$1;
+	local image_name=$2;
+	local image_path=$3;
+	shift shift shift
+	local oscap_params=$*
+
+	export oscap_path="$(cd $path; pwd)"
+	export oscap_os="Linux"
+	export oscap_version='uname --kernel-release'
+	export oscap_platform='uname --hardware-plaform'
+	export oscap_host='docker-$target-$image'
+	#echo "$oscap_path"
+	oscap $oscap_arguments
+}
+
+module=$1;shift
+
+case $module in
+image)
+	echo Scanning image:
+	name=$1;shift
+	echo "	$name"
+	echo
+	oscap_params=$*
+	#Make a temporary directory
+	image_root=`mktemp -d docker.XXXXXX`
+	mount_docker $name $image_dir
+	get_oscap_content "image" $name $image_dir $oscap_params
+	echo Scanning with the following oscap parameters:
+	echo "	$oscap_params"
+	unmount_docker $name
+	exit 0
+	;;
+
+container)
+	echo Scanning container
+	name=$2;
+	oscap_params=$*
+
+
+
+
+	exit 0
+	;;
+*)
+	catch-all
+	exit 1
+	;;
+esac
