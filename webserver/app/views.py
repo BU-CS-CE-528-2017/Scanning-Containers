@@ -9,5 +9,5 @@ def index():
 	#for mongo:
 	#online_users = mongo.db.users.find({'online':True})
 	
-	return render_template('index.html', title='Home', user=user)
+	return render_template('web_page2.html', title='Home', user=user)
 
