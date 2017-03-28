@@ -15,12 +15,12 @@ def is_valid_file(parser, arg):
         return arg  # return an open file handle
 
 def is_valid_type(parser,arg):
-    if  arg != "oval" or   arg != "xccdf":
+    if  str(arg) != "oval" or str(arg) != "xccdf":
         parser.error("Invalid type: xccdf and oval allowed")
     else:
-        return arg  # return an open file handle
+        return arg
 
-# Argument parser to specify SCAP result file path
+# Argument parser
 
 parser = ArgumentParser(description="arg parse")
 
@@ -28,8 +28,9 @@ parser.add_argument("-s", dest="source", required=True,
                     help="Source file of scap content (Required)", metavar="FILE",
                     type=lambda arg: is_valid_file(parser, arg))
 parser.add_argument("-type", dest="type", required=True,
-                    help="Type of scan (xccdf or oval) (Required)",
-                    type=lambda arg: is_valid_type(parser,arg))
+                    help="Type of scan (xccdf or oval) (Required)", metavar="TYPE",
+                    #type=lambda arg: is_valid_type(parser,arg)
+                    )
 parser.add_argument("-d", dest="dest", required=False,
                     help="Destination file for JSON (Optional)", metavar="FILE")
 parser.add_argument("-u", dest="user", required=False,
@@ -37,9 +38,7 @@ parser.add_argument("-u", dest="user", required=False,
 parser.add_argument("-db", dest="db", required=False,
                     help="Name of database (optional)")
 
-
 args = parser.parse_args()
-
 
 contentPath = ""
 filePath = contentPath + args.source
@@ -81,18 +80,13 @@ if args.type == "xccdf":
         resName = rowArray[0].getText()
         resSeverity = rowArray[1].getText()
         resultTF = rowArray[2].getText()
-
-
         referenceLink = "none"
-
-
-        # format datetime
-
         coll.insert(
             {
                 "scanid": scanid,
                 "timestamp":
                     {
+                        "time" : now,
                         "year": year,
                         "month": month,
                         "day": day,
@@ -105,30 +99,17 @@ if args.type == "xccdf":
                 "type": "compliance",
                 "resultTF": resultTF,
                 "referenceLink": referenceLink
-
             }
         )
-
         i += 1
         if i >= lines:
             break
-
-
-
 
 else:
 
     soup = BeautifulSoup(html_string, 'lxml')
     topTable = soup.find_all('table', { "border" : "1" })[3]
     resultTable = topTable.find_next_siblings('table')[0]
-    #print(topTable)
-    #print(resultTable)
-
-
-
-    # add a unique identifier for each scan
-
-
 
     #find only applicable lines
     for row in resultTable.find_all('tr',
@@ -163,6 +144,7 @@ else:
                 "scanid" : scanid,
                 "timestamp":
                     {
+                        "time": now,
                         "year": year ,
                         "month": month ,
                         "day": day ,
@@ -189,7 +171,7 @@ else:
 
 coll.insert(
     {
-        "scanid": "latest",
+        "scanid": scanid + "-html",
         "timestamp":
             {
                 "year": year,
