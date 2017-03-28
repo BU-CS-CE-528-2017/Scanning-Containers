@@ -1,0 +1,13 @@
+# platform = Red Hat Enterprise Linux 6, Red Hat Enterprise Linux 7, multi_platform_fedora, Debian 8, Ubuntu 16.04
+# reboot = false
+# strategy = enable
+# complexity = low
+# disruption = low
+- name: Enable service SERVICENAME
+  service:
+    name="{{item}}"
+    enabled="yes"
+    state="started"
+  with_items:
+    - SERVICENAME
+
