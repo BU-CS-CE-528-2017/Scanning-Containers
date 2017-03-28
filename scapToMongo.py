@@ -98,16 +98,7 @@ def xccdf(source, user, db="scans"):
         coll.insert(
             {
                 "scanid": scanid,
-                "timestamp":
-                    {
-                        "time" : now,
-                        "year": year,
-                        "month": month,
-                        "day": day,
-                        "hour": hour,
-                        "minute": minute,
-                        "second": second
-                    },
+                "timestamp": now,
                 "rawHtml": str(row),
                 "resName": resName,
                 "resSeverity": resSeverity,
@@ -119,7 +110,8 @@ def xccdf(source, user, db="scans"):
         i += 1
         if i >= lines:
             break
-        storeHtml(coll, scanid, now, html_string)
+    storeHtml(coll, scanid, now, html_string)
+    return html_string
 
 def oval(source, user, db="scans"):
 
@@ -167,16 +159,7 @@ def oval(source, user, db="scans"):
         coll.insert(
             {
                 "scanid" : scanid,
-                "timestamp":
-                    {
-                        "time": now,
-                        "year": year ,
-                        "month": month ,
-                        "day": day ,
-                        "hour": hour ,
-                        "minute": minute ,
-                        "second": second
-                    },
+                "timestamp": now,
                 "rawHtml": rawHtml,
                 "id": resID,
                 "result": resultTF,
@@ -190,7 +173,8 @@ def oval(source, user, db="scans"):
         if i>=lines:
             break
 
-        storeHtml(coll, scanid, now, html_string)
+    storeHtml(coll, scanid, now, html_string)
+    return html_string
 
 # add the entire scan's html as just a raw string
 # this is found using:
