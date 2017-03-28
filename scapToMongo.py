@@ -27,15 +27,16 @@ parser = ArgumentParser(description="arg parse")
 parser.add_argument("-s", dest="source", required=True,
                     help="Source file of scap content (Required)", metavar="FILE",
                     type=lambda arg: is_valid_file(parser, arg))
+parser.add_argument("-type", dest="type", required=True,
+                    help="Type of scan (xccdf or oval) (Required)",
+                    type=lambda arg: is_valid_type(parser,arg))
 parser.add_argument("-d", dest="dest", required=False,
                     help="Destination file for JSON (Optional)", metavar="FILE")
 parser.add_argument("-u", dest="user", required=False,
                     help="Username to associate results file with (Required)")
 parser.add_argument("-db", dest="db", required=False,
                     help="Name of database (optional)")
-parser.add_argument("-type", dest="type", required=False,
-                    help="Type of scan (xccdf or oval) (optional)",
-                    type=lambda arg: is_valid_type(parser,arg))
+
 
 args = parser.parse_args()
 
@@ -144,7 +145,7 @@ else:
                      "otherB"]}):
         rawHtml = str(row)
         rowArray = row.find_all('td')
-        print(rowArray)
+
         resID = rowArray[0].getText()
         resultTF = rowArray[1].getText()
         resultClass = rowArray[2].getText()
