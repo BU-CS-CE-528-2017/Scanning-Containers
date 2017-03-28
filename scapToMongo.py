@@ -2,11 +2,10 @@ from pymongo import MongoClient
 from argparse import ArgumentParser
 import os.path
 from bs4 import BeautifulSoup
-import numpy as np
 from pprint import pprint
 import datetime
 import uuid
-
+import os
 
 def is_valid_file(parser, arg):
     if not os.path.exists(arg):
@@ -21,7 +20,7 @@ def is_valid_type(parser,arg):
         return arg
 
 # Argument parser
-
+'''
 parser = ArgumentParser(description="arg parse")
 
 parser.add_argument("-s", dest="source", required=True,
@@ -44,13 +43,19 @@ contentPath = ""
 filePath = contentPath + args.source
 user = args.user
 
-html_string = open(filePath, 'r').read()
+html_string = open(filePath,'r').read()
+
 scanid = str(uuid.uuid4())
+
+
+
 
 cl = MongoClient()
 coll = cl["scans"][user]
+#'''
 
 
+# get timestamp info
 now = datetime.datetime.now()
 year = int(now.year)
 month = int(now.month)
@@ -62,16 +67,25 @@ second = int(now.second)
 
 
 i=0
-#number of lines to search
+# max number of lines to search (basically a failsafe against attacks)
 lines = 10000
+def xccdf(source, user, db="scans"):
 
-if args.type == "xccdf":
+    contentPath = ""
+    filePath = contentPath + source
+    user = user
 
+    html_string = open(filePath, 'r').read()
+    scanid = str(uuid.uuid4())
+
+    cl = MongoClient()
+    coll = cl[db][user]
 
     soup = BeautifulSoup(html_string, 'lxml')
     resultTable = soup.find_all("table", {"class":"treetable"})[0]
 
-
+    i=0
+    # find only applicable lines
     for row in resultTable.find_all('tr', {"class": "rule-overview-leaf"}):
 
 
@@ -94,6 +108,7 @@ if args.type == "xccdf":
                         "minute": minute,
                         "second": second
                     },
+                "rawHtml": str(row),
                 "resName": resName,
                 "resSeverity": resSeverity,
                 "type": "compliance",
@@ -104,13 +119,24 @@ if args.type == "xccdf":
         i += 1
         if i >= lines:
             break
+        storeHtml(coll, scanid, now, html_string)
 
-else:
+def oval(source, user, db="scans"):
+
+    contentPath = ""
+    filePath = contentPath + source
+    user = user
+
+    html_string = open(filePath, 'r').read()
+    scanid = str(uuid.uuid4())
+
+    cl = MongoClient()
+    coll = cl[db][user]
 
     soup = BeautifulSoup(html_string, 'lxml')
     topTable = soup.find_all('table', { "border" : "1" })[3]
     resultTable = topTable.find_next_siblings('table')[0]
-
+    i = 0
     #find only applicable lines
     for row in resultTable.find_all('tr',
                 {"class":
@@ -126,7 +152,6 @@ else:
                      "otherB"]}):
         rawHtml = str(row)
         rowArray = row.find_all('td')
-
         resID = rowArray[0].getText()
         resultTF = rowArray[1].getText()
         resultClass = rowArray[2].getText()
@@ -152,8 +177,6 @@ else:
                         "minute": minute ,
                         "second": second
                     },
-
-
                 "rawHtml": rawHtml,
                 "id": resID,
                 "result": resultTF,
@@ -167,53 +190,27 @@ else:
         if i>=lines:
             break
 
-    # add the latest html
+        storeHtml(coll, scanid, now, html_string)
 
-coll.insert(
-    {
-        "scanid": scanid + "-html",
-        "timestamp":
-            {
-                "year": year,
-                "month": month,
-                "day": day,
-                "hour": hour,
-                "minute": minute,
-                "second": second
-            },
-        "html": html_string
-    }
+# add the entire scan's html as just a raw string
+# this is found using:
+#   db.user.find({"scanid":"xxxx-xxxx-xxxx-html"})
+
+def storeHtml(coll,scanid,now,html_string):
+    coll.insert(
+        {
+            "scanid": scanid + "-html",
+            "timestamp":
+                {
+                    "time": now
+                },
+            "html": html_string
+        }
 
 )
 
 
 
-
-
-'''
-Here's the basic schema for data in the db
-
-{ "_id" : ObjectId("58d98c8e0218239a229b35d8"),
- "Class" : "vulnerability",
- "rawHtml" : "<tr>etc....</tr>",
- "Reference Link" : "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-6831",
- "Reference ID" : "[CVE-2017-6831]",
- "id" : "oval:com.ubuntu.xenial:def:20176831000",
- "result" : "true",
- "timestamp" : { "month" : 3,
- "hour" : 18,
- "second" : 2,
- "day" : 27,
- "minute" : 5,
- "year" : 2017 },
- "scanid" : "e68f226e-b56a-45f7-8b3b-24c75f6146fc" }
-
-
-
-
-
-
-'''
 
 
 
