@@ -13,7 +13,7 @@ def index():
 @app.route('/action', methods = ['POST'])
 def get_tasks():
         string = request.form['dockerrep']
-	cmd = "docker run"+string
+	cmd = "sudo docker run"+string
         result = subprocess.check_output(cmd, shell=True)
         print result
         return jsonify("hahahaha")
