@@ -11,6 +11,15 @@ cl = MongoClient()
 collUsers = cl["scans"]["users"]
 
 def scan(user,container,type="oval",db="scans",destination=""):
+    '''
+    Main function for performing a scan
+    :param user: username
+    :param container: name of container
+    :param type: oval or xccdf
+    :param db: name of database (optional)
+    :param destination: name of report file to save to
+    :return: html (string) the raw html of the report
+    '''
 
     db = str(db)
     coll = cl[db][user]
@@ -19,17 +28,21 @@ def scan(user,container,type="oval",db="scans",destination=""):
     if type not in ["xccdf","oval"]:
         raise ValueError
 
-    if user not in collUsers.find({"username":user}, {"_id" : 1}):
+    if collUsers.find({"username":user}).count() < 1:
         print("Creating new user: ",user)
         createUser(user)
 
-    '''
-    if coll.count() > 10000:
+    #'''
+
+    print("User entries: ",coll.count())
+    if coll.count() > 20000:
         print("Too many entries for user. Attemping to cleanup...")
         cleanupUser(user)
-        if coll.count() > 10000:
-            print("User has too many entries")
-            sys.exit(1)
+        for i in range(24,0,-1):
+            print("User entries: ", coll.count())
+            print("Too many entries for user. Deleting entries older than ", i," hours")
+            cleanupUser(user,age=i)
+
     #'''
     '''
     TODO:
@@ -44,10 +57,13 @@ def scan(user,container,type="oval",db="scans",destination=""):
     # Create report filename
     #
     if destination == "":
-        destination = "report.html"
+        if type == "oval":
+            destination = "report.html"
+        elif type == "xccdf":
+            destination = "report1.html"
     else:
         destination = "report-" + str(user) + str(container) + str(time.time())
-    print(destination)
+
     '''
     TODO:
     Fix everything here...
@@ -64,6 +80,13 @@ def scan(user,container,type="oval",db="scans",destination=""):
         html = scapToMongo.xccdf(destination,user)
 
     elif type == "oval":
+        # Record
+        if len(coll.distinct("scanid")) > 5:
+            cleanupUser(user)
+            if len(coll.distinct("scanid")) > 5:
+                print("User quota exceeded: no more OVAL scans allowed")
+
+
         '''
         subprocess.call(
             "oscap-docker oval eval " +
@@ -78,11 +101,18 @@ def scan(user,container,type="oval",db="scans",destination=""):
     '''
     To here
     '''
-    pprint.pprint(html)
+    #pprint.pprint(html)
+    print("Done")
     return html
 
 
 def createUser(user,db="scans"):
+    '''
+
+    :param user: username
+    :param db: name of database (optional)
+    :return:
+    '''
     coll = cl[db][user]
     coll.insert({"init":"init"})
 
@@ -95,6 +125,12 @@ def createUser(user,db="scans"):
         )
 
 def removeUser(user,db="scans"):
+    '''
+
+    :param user: username
+    :param db: name of database (optional)
+    :return:
+    '''
     coll = cl[db][user]
     coll.drop()
 
@@ -104,10 +140,19 @@ def removeUser(user,db="scans"):
 
     print("User: ", user, " is dead")
 
-def cleanupUser(user,db="scans",age=24):
-
+def cleanupUser(user,db="scans",age=24,all=False):
+    '''
+    :param user: username
+    :param db: name of database (optional)
+    :param age: deletes entries older than this number (hours) (optional)
+    :param all: override to delete all entries
+    :return:
+    '''
     coll = cl[db][user]
-    print(coll)
+
+    if all == True:
+        coll.remove({})
+
     timeCutoff = datetime.datetime.now() - datetime.timedelta(hours=age)
     print(timeCutoff)
 
@@ -116,7 +161,7 @@ def cleanupUser(user,db="scans",age=24):
     )
     )
 
-    print("done")
+
 
 
 '''
