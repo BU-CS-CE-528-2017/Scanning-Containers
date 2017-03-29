@@ -13,11 +13,6 @@ def is_valid_file(parser, arg):
     else:
         return arg  # return an open file handle
 
-def is_valid_type(parser,arg):
-    if  str(arg) != "oval" or str(arg) != "xccdf":
-        parser.error("Invalid type: xccdf and oval allowed")
-    else:
-        return arg
 
 # Argument parser
 '''
@@ -82,6 +77,10 @@ def xccdf(source, user, db="scans"):
     coll = cl[db][user]
 
     soup = BeautifulSoup(html_string, 'lxml')
+
+    # store the raw html immediately
+
+    storeHtml(coll, scanid, now, html_string)
     resultTable = soup.find_all("table", {"class":"treetable"})[0]
 
     i=0
@@ -110,7 +109,7 @@ def xccdf(source, user, db="scans"):
         i += 1
         if i >= lines:
             break
-    storeHtml(coll, scanid, now, html_string)
+
     return html_string
 
 def oval(source, user, db="scans"):
@@ -126,6 +125,9 @@ def oval(source, user, db="scans"):
     coll = cl[db][user]
 
     soup = BeautifulSoup(html_string, 'lxml')
+
+    # store the raw html immediately
+    storeHtml(coll, scanid, now, html_string)
     topTable = soup.find_all('table', { "border" : "1" })[3]
     resultTable = topTable.find_next_siblings('table')[0]
     i = 0
@@ -173,7 +175,7 @@ def oval(source, user, db="scans"):
         if i>=lines:
             break
 
-    storeHtml(coll, scanid, now, html_string)
+
     return html_string
 
 # add the entire scan's html as just a raw string
