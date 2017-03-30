@@ -25,13 +25,15 @@ def scan(user,container,type="oval",db="scans",destination="",note=False):
     :return: html (string) the raw html of the report
     '''
 
+    if type not in ["xccdf","oval"]:
+        print("invalid param: type")
+        sys.exit(1)
+
     db = str(db)
     coll = cl[db][user]
 
     type = type.lower()
-    if type not in ["xccdf","oval"]:
-        print("invalid param: type")
-        sys.exit(1)
+
 
     if collUsers.find({"username":user}).count() < 1:
 
@@ -43,11 +45,7 @@ def scan(user,container,type="oval",db="scans",destination="",note=False):
     #'''
     '''
     TODO:
-
         We need to check for the os / version of the container
-
-
-
     '''
 
 
@@ -170,7 +168,11 @@ def cleanupUser(user,db="scans",age=24,type=["xccdf","oval"],all=False):
         "timestamp": {"$lt": timeCutoff}}
     )
 
-def getVersion(user,container)
+def getVersion():
+    subprocess.call("source /etc/os-release")
+    os = subprocess.call("echo $ID")
+    version = subprocess.call("echo $VERSION_ID")
+    return os,version
 
 def sendNotification(user,html,email=""):
 
