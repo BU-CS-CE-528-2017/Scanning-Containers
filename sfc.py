@@ -169,10 +169,7 @@ def cleanupUser(user,db="scans",age=24,type=["xccdf","oval"],all=False):
     )
 
 def getVersion():
-    #subprocess.call("source /etc/os-release")
-    exec("source /etc/os-release")
     os = subprocess.call("echo $ID")
-
     version = subprocess.call("echo $VERSION_ID")
     return os,version
 
