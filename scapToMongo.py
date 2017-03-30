@@ -80,7 +80,7 @@ def xccdf(source, user, db="scans"):
 
     # store the raw html immediately
 
-    storeHtml(coll, scanid, now, html_string)
+    storeHtml(coll, scanid, now, html_string,"xccdf")
     resultTable = soup.find_all("table", {"class":"treetable"})[0]
 
     i=0
@@ -110,7 +110,7 @@ def xccdf(source, user, db="scans"):
         if i >= lines:
             break
 
-    return html_string
+    return html_string,scanid
 
 def oval(source, user, db="scans"):
 
@@ -127,7 +127,7 @@ def oval(source, user, db="scans"):
     soup = BeautifulSoup(html_string, 'lxml')
 
     # store the raw html immediately
-    storeHtml(coll, scanid, now, html_string)
+    storeHtml(coll, scanid, now, html_string,"oval")
     topTable = soup.find_all('table', { "border" : "1" })[3]
     resultTable = topTable.find_next_siblings('table')[0]
     i = 0
@@ -176,16 +176,17 @@ def oval(source, user, db="scans"):
             break
 
 
-    return html_string
+    return html_string,scanid
 
 # add the entire scan's html as just a raw string
 # this is found using:
 #   db.user.find({"scanid":"xxxx-xxxx-xxxx-html"})
 
-def storeHtml(coll,scanid,now,html_string):
+def storeHtml(coll,scanid,now,html_string,type):
     coll.insert(
         {
             "scanid": scanid + "-html",
+            "type":type,
             "timestamp":
                 {
                     "time": now
