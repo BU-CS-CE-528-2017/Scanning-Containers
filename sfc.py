@@ -12,7 +12,9 @@ from email.mime.text import MIMEText
 cl = MongoClient()
 collUsers = cl["scans"]["users"]
 
-
+def getDB(user,db="scans"):
+    coll = cl[db][user]
+    return coll
 
 def scan(user,container,type="oval",db="scans",destination="",note=False):
     '''
@@ -169,7 +171,6 @@ def cleanupUser(user,db="scans",age=24,type=["xccdf","oval"],all=False):
     )
 
 def getVersion():
-    subprocess.call("source /etc/os-release")
     os = subprocess.call("echo $ID")
     version = subprocess.call("echo $VERSION_ID")
     return os,version
