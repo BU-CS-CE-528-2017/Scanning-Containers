@@ -7,9 +7,9 @@ Licence: GPLv3
 from flask import url_for, redirect, render_template, flash, g, session, current_app
 from flask.ext.login import login_user, logout_user, current_user, login_required
 from app import app, lm
-from forms import ExampleForm, LoginForm
-from pymongo import MongoClient, Connection
-
+#from forms import ExampleForm, LoginForm
+from pymongo import MongoClient
+from .sfc import scan, getDB
 
 @app.route('/')
 def index():
@@ -17,12 +17,13 @@ def index():
 
 #names = ['a', 'b', 'c', 'd', 'e']
 
-#usr = "ben"
-#testcontainer = "blahblah"
-#s = sfc.scan(usr, testcontainer)
-#names = scans.ben.find().limit(6);
+usr = "ben"
+testcontainer = "blahblah"
 
-datab = get_db()
+datab = getDB(usr)
+s = scan(usr, testcontainer)
+names = datab.ben.find().limit(6);
+
 
 @app.route('/list/') #methods = ['GET']
 def posts():
@@ -36,15 +37,16 @@ def new():
 	form = ExampleForm()
 	return render_template('new.html', form=form)
 
+'''
 @app.route('/save/', methods = ['GET','POST'])
 @login_required
 def save():
 	form = ExampleForm()
 	if form.validate_on_submit():
-		print "salvando os dados:"
-		print form.title.data
-		print form.content.data
-		print form.date.data
+		print("salvando os dados:")
+		print(form.title.data)
+		print(form.content.data)
+		print(form.date.data)
 		flash('Dados salvos!')
 	return render_template('new.html', form=form)
 
@@ -53,7 +55,7 @@ def view(id):
 	return render_template('view.html')
 
 # === User login methods ===
-'''
+
 @app.before_request
 def before_request():
     g.user = current_user

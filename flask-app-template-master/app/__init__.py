@@ -10,7 +10,7 @@ from flask.ext.bootstrap import Bootstrap
 from flask.ext.pymongo import PyMongo
 from flask.ext.login import LoginManager
 #from pymongo import MongoClient, Connection
-from sfc import scan
+
 
 app = Flask(__name__)
 
@@ -31,7 +31,7 @@ def get_db():
 app.config.from_object('app.configuration.DevelopmentConfig')
 #app.config.from_object('configuration.TestingConfig')
 
-bs = Bootstrap(app) #flask-bootstrap
+bootstrap = Bootstrap(app) #flask-bootstrap
 #db = SQLAlchemy(app) #flask-sqlalchemy
 #db = PyMongo(app)
 
