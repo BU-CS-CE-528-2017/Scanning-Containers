@@ -1,0 +1,11 @@
+# platform = Red Hat Enterprise Linux 6, Red Hat Enterprise Linux 7, multi_platform_fedora, Debian 8
+# reboot = false
+# strategy = disable
+# complexity = low
+# disruption = low
+- name: Ensure PKGNAME is removed
+  package:
+    name="{{item}}"
+    state=absent
+  with_items:
+    - PKGNAME
