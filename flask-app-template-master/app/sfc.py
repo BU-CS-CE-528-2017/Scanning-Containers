@@ -5,10 +5,12 @@ import subprocess
 import time
 import pprint
 import sys
+import __init__
 
 
 cl = MongoClient()
 collUsers = cl["scans"]["users"]
+
 
 def scan(user,container,type="oval",db="scans",destination=""):
 

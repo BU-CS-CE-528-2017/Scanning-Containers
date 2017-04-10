@@ -4,20 +4,31 @@ Python Aplication Template
 Licence: GPLv3
 """
 
-from flask import url_for, redirect, render_template, flash, g, session
+from flask import url_for, redirect, render_template, flash, g, session, current_app
 from flask.ext.login import login_user, logout_user, current_user, login_required
 from app import app, lm
 from forms import ExampleForm, LoginForm
-from models import User
+from pymongo import MongoClient, Connection
+
 
 @app.route('/')
 def index():
 	return render_template('index.html')
 
+#names = ['a', 'b', 'c', 'd', 'e']
 
-@app.route('/list/')
+#usr = "ben"
+#testcontainer = "blahblah"
+#s = sfc.scan(usr, testcontainer)
+#names = scans.ben.find().limit(6);
+
+datab = get_db()
+
+@app.route('/list/') #methods = ['GET']
 def posts():
-	return render_template('list.html')
+	return render_template('list.html', names = names)
+
+
 
 @app.route('/new/')
 @login_required
@@ -42,7 +53,7 @@ def view(id):
 	return render_template('view.html')
 
 # === User login methods ===
-
+'''
 @app.before_request
 def before_request():
     g.user = current_user
@@ -67,5 +78,5 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('index'))
-
+'''
 # ====================

@@ -14,12 +14,10 @@
 
 			<table class="table">
 				<tr>
-					<th>Coluna 1</th>
-					<th>Coluna 2</th>
-					<th>Coluna 3</th>
-					<th>Coluna 4</th>
-					<th>Coluna 5</th>
-					<th>Coluna 6</th>
+					{% for name in names %}
+						<th> {{ name }} </th>
+					{% endfor %} 
+				
 				</tr>
 				<tr>
 					<td>valor 1</td>
