@@ -6,6 +6,7 @@ from pprint import pprint
 import datetime
 import uuid
 import os
+import json
 
 def is_valid_file(parser, arg):
     if not os.path.exists(arg):
@@ -15,6 +16,7 @@ def is_valid_file(parser, arg):
 
 
 # Argument parser
+
 '''
 parser = ArgumentParser(description="arg parse")
 
@@ -85,6 +87,9 @@ def xccdf(source, user, db="scans"):
 
     i=0
     # find only applicable lines
+    data = {}
+    bulk = coll.initialize_unordered_bulk_op();
+
     for row in resultTable.find_all('tr', {"class": "rule-overview-leaf"}):
 
 
@@ -94,7 +99,7 @@ def xccdf(source, user, db="scans"):
         resSeverity = rowArray[1].getText()
         resultTF = rowArray[2].getText()
         referenceLink = "none"
-        coll.insert(
+        bulk.insert(
             {
                 "scanid": scanid,
                 "timestamp": now,
@@ -109,7 +114,7 @@ def xccdf(source, user, db="scans"):
         i += 1
         if i >= lines:
             break
-
+    bulk.execute();
     return html_string,scanid
 
 def oval(source, user, db="scans"):
@@ -132,6 +137,9 @@ def oval(source, user, db="scans"):
     resultTable = topTable.find_next_siblings('table')[0]
     i = 0
     #find only applicable lines
+
+    bulk = coll.initialize_unordered_bulk_op();
+
     for row in resultTable.find_all('tr',
                 {"class":
                     ["resultbadA",
@@ -150,6 +158,7 @@ def oval(source, user, db="scans"):
         resultTF = rowArray[1].getText()
         resultClass = rowArray[2].getText()
         referenceID = rowArray[3].getText()
+        print(resID)
         try:
             referenceLink = rowArray[2].find('a')['href']
         except:
@@ -175,7 +184,7 @@ def oval(source, user, db="scans"):
         if i>=lines:
             break
 
-
+    bulk.execute();
     return html_string,scanid
 
 # add the entire scan's html as just a raw string

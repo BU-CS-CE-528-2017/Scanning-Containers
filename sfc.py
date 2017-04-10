@@ -12,7 +12,9 @@ from email.mime.text import MIMEText
 cl = MongoClient()
 collUsers = cl["scans"]["users"]
 
-
+def getDB(user,db="scans"):
+    coll = cl[db][user]
+    return coll
 
 def scan(user,container,type="oval",db="scans",destination="",note=False):
     '''
