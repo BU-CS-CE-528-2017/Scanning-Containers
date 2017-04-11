@@ -66,6 +66,7 @@ second = int(now.second)
 i=0
 # max number of lines to search (basically a failsafe against attacks)
 lines = 10000
+
 def xccdf(source, user, db="scans"):
 
     contentPath = ""
