@@ -5,7 +5,7 @@ Licence: GPLv3
 """
 
 from flask import url_for, redirect, render_template, flash, g, session, current_app
-from flask.ext.login import login_user, logout_user, current_user, login_required
+from flask_login import login_user, logout_user, current_user, login_required
 from app import app, lm
 #from forms import ExampleForm, LoginForm
 from pymongo import MongoClient
@@ -15,14 +15,14 @@ from .sfc import scan, getDB
 def index():
 	return render_template('index.html')
 
-#names = ['a', 'b', 'c', 'd', 'e']
+names = ['a', 'b', 'c', 'd', 'e']
 
 usr = "ben"
 testcontainer = "blahblah"
 
 datab = getDB(usr)
-s = scan(usr, testcontainer)
-names = datab.ben.find().limit(6);
+#s = scan(usr, testcontainer)
+#names = datab.ben.find().limit(6);
 
 
 @app.route('/list/') #methods = ['GET']

@@ -158,7 +158,7 @@ def oval(source, user, db="scans"):
         resultTF = rowArray[1].getText()
         resultClass = rowArray[2].getText()
         referenceID = rowArray[3].getText()
-        print(resID)
+        #print(resID)
         try:
             referenceLink = rowArray[2].find('a')['href']
         except:

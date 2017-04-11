@@ -5,10 +5,10 @@ Licence: GPLv3
 """
 
 from flask import Flask, current_app
-from flask.ext.bootstrap import Bootstrap
+from flask_bootstrap import Bootstrap
 #from flask.ext.sqlalchemy import SQLAlchemy
-from flask.ext.pymongo import PyMongo
-from flask.ext.login import LoginManager
+from flask_pymongo import PyMongo
+from flask_login import LoginManager
 #from pymongo import MongoClient, Connection
 
 
